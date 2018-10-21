@@ -1,6 +1,8 @@
 import sqlite3
 from sqlite3 import Error
 
+global currentUser
+
 def createConnection(P1):
 	try:
 		conn = sqlite3.connect(P1)
@@ -31,7 +33,11 @@ def selectMemByEmail(conn, email):
 	for row in rows:
 		print(row)
 		
-def createMem(conn, email, name, phone, pwd):
+def createMem(conn):
+	email = input("Please enter your email: ")
+	name = input("Please enter your name: ")
+	phone = input("Please enter your phone: ")
+	pwd = input("Please enter your pwd: ")
 	cur = conn.cursor()
 	cur.execute("insert into members values(:email, :name, :phone, :pwd)", {"email": email, "name": name, "phone": phone, "pwd": pwd})
 		
@@ -46,12 +52,24 @@ def createRide(conn, rno, price, rdate, seats, lugDesc, src, dst, driver, cno):
 def offerRide(rdate, numSeats, pricePerSeat, lugDesc, src, dst):
 	pass
 	
-def varifyPwd(psd):
+
+def varifyPwd(conn):
 	# encrypt, decrypt, varify the pwd stored under the members email with the one entered
-	pass
+	email = input("please enter your email: ")
+	pwdTry = input("please enter your password: ")
+	cur = conn.cursor()
+	cur.execute("select pwd from members where (email=:email)", {"email":email})
+	realPwd = cur.fetchone()
+	if (realPwd[0] == pwdTry):
+		print("Welcome")
+		return True
+	else:
+		print("Incorrect Password")
+		return False
 
 def getUnseenMessages():
 	# On login, display all messages that are marked as unseen 
+	
 	pass
 
 def exitProgram():
@@ -71,11 +89,22 @@ def cancelBooking():
 def main():
 	database = "/home/ben/Desktop/CMPUT291/P1/P1.db"
 	conn = createConnection(database)
-
+	while True:
+	
+		SorL = input("Enter S to signup or L to login")
+		if SorL == "l":
+			if not varifyPwd(conn):
+				continue
+			
+		elif SorL == "s":
+			createMem(conn)
+			varifyPwd(conn)
+		
+	
+		
+		
 	with conn:
-		print("1. Query memebers by email: ")
-		selectMemByEmail(conn, "ben@g.com")
-		selectAllMem(conn)
+		print(varifyPwd(conn, "pwd48", "mem48@g.com"))
 		
 if __name__ == '__main__':
 	main()
